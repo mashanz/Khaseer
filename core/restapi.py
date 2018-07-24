@@ -1,9 +1,31 @@
+import requests
+import json
+
+
 class Api:
 
-    def __init__(self, masukan):
-        self.input = masukan
-        self.output = 0
+    def __init__(self, baseurl):
+        self.baseurl = baseurl
+        self.status = ""
+        self.body = ""
+        self.cookies = ""
+        self.headers = ""
 
-    def sum(self, add):
-        self.output = self.input + add
-        return self
+    def get(self, path, param):
+        response = requests.request("GET", self.baseurl + path, params=param)
+        self.status = response.status_code
+        self.body = response.text
+        self.cookies = response.cookies
+        self.headers = response.headers
+
+    def post(self, path, param):
+        payload = json.dumps(param)
+        payload = payload.replace(", ", ",")
+        payload = payload.replace("{", "{\n\t")
+        payload = payload.replace("\",", "\",\n\t")
+        payload = payload.replace("}", "\n}")
+        response = requests.request("POST", self.baseurl + path, data=payload)
+        self.status = response.status_code
+        self.body = response.text
+        self.cookies = response.cookies
+        self.headers = response.headers
